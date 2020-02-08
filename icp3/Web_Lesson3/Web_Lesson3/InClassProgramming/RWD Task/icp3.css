@@ -1,0 +1,24 @@
+.container{
+    margin-bottom: auto;
+}
+.logo{
+    align-items: center;
+}
+h1{
+    font-family: 'Red Hat Display', sans-serif;
+}
+h3{
+    font-family: 'Red Hat Display', sans-serif;
+}
+h2{
+    font-family: 'Red Hat Display', sans-serif;
+}
+h4{
+    font-family: 'Red Hat Display', sans-serif;
+}
+p{
+    font-family: 'Red Hat Display', sans-serif;
+}
+.game{
+      margin: auto;
+}
