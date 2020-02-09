@@ -8,7 +8,8 @@ alert("HAVE FUN!!!!!!!");
 function my_game(a) {
     // this math.floor return largest interger less than 3 or equal to 3
     let j = Math.floor(Math.random() * 3 + 1);
-    document.getElementById("result").innerText = "Wait!";
+    document.getElementById("result");innerText = "Wait!";
+
     let k = "";
     if (a === 1) {
         if (j === 1) {
@@ -16,8 +17,11 @@ function my_game(a) {
         } else if (j === 2) {
             k = "you lost"
         } else {
-            k = "you won"
+            k = "you won";
+
         }
+
+
     } else if (a === 2) {
 
         if (j === 1) {
@@ -45,7 +49,11 @@ function my_game(a) {
             b = "paper";
             break;
         case 3:
-            b = "scissor"
+            b = "scissor";
+            break;
+
+
     }
+
     document.getElementById("result").innerText = "Computer picked " + b+ ", " + k;
 }

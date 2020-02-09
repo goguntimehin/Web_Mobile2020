@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEW_GAME</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Rock,Paper,Scissor</title>
+    <!--i import the boostrap link to my code and link javascript to my html-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="game.css">
+</head>
+<body>
+
+<h1>Welcome to Rock,Paper, Scissor game</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4 calc">
+            <p id="logo"> My game </p>
+            <div class="screen">
+                <p id="equation">Result</p>
+                <p id="result"></p>
+            </div>
+            <div class="buttons">
+                <div type="button" onclick="my_game(1)" class="btn btn-primary btn-md">Rock</div>
+                <div type="button" onclick="my_game(2)" class="btn btn-primary btn-md">Paper</div>
+                <div type="button" onclick="my_game(3)" class="btn btn-primary btn-md">Scissor</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="gamescript.js"></script>
+
+</body>
+</html>
