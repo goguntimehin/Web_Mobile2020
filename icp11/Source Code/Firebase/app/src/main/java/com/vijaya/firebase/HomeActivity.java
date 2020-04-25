@@ -1,6 +1,8 @@
 package com.vijaya.firebase;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,23 +10,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.auth.FirebaseAuth;
-import android.content.Intent;
 
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getSimpleName();
     private TextView txtDetails;
     private EditText inputName, inputPhone;
-    private Button btnSave;
-    private Button btnLogut;
+    private Button btnSave, btnsignout;
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
 
@@ -43,8 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         inputName = (EditText) findViewById(R.id.name);
         inputPhone = (EditText) findViewById(R.id.phone);
         btnSave = (Button) findViewById(R.id.btn_save);
-        btnLogut  = (Button) findViewById(R.id.logout);
-
+        btnsignout = (Button) findViewById(R.id.btn_signout);
         mFirebaseInstance = FirebaseDatabase.getInstance();
 
         // get reference to 'users' node
@@ -72,6 +71,19 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        btnsignout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                try {
+                    mAuth.signOut();
+                    startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+                }catch (Exception e) {
+                    Log.e(TAG, "onClick: Exception "+e.getMessage(),e );
+                }
+            }
+        });
+
         // Save / update the user
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,17 +100,9 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        btnLogut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                finish();
-                startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-
-            }
-        });
         toggleButton();
     }
+
 
     // Changing button text
     private void toggleButton() {
@@ -166,4 +170,5 @@ public class HomeActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(phone))
             mFirebaseDatabase.child(userId).child("phone").setValue(phone);
     }
+
 }

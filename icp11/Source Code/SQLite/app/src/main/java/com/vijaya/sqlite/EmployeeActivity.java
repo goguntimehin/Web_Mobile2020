@@ -1,6 +1,7 @@
 package com.vijaya.sqlite;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.DataBindingUtil;
@@ -18,9 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class EmployeeActivity extends AppCompatActivity {
-
+ 
     private ActivityEmployeeBinding binding;
     private static final String TAG = "EmployeeActivity";
+    private boolean upd = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,20 @@ public class EmployeeActivity extends AppCompatActivity {
         cursorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.employerSpinner.setAdapter(cursorAdapter);
 
+        binding.UpdateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateToDB();
+            }
+        });
+
+        binding.DeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteFromDB();
+            }
+        });
+
         binding.saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,21 +86,18 @@ public class EmployeeActivity extends AppCompatActivity {
         values.put(SampleDBContract.Employee.COLUMN_FIRSTNAME, binding.firstnameEditText.getText().toString());
         values.put(SampleDBContract.Employee.COLUMN_LASTNAME, binding.lastnameEditText.getText().toString());
         values.put(SampleDBContract.Employee.COLUMN_JOB_DESCRIPTION, binding.jobDescEditText.getText().toString());
-        values.put(SampleDBContract.Employee.COLUMN_EMPLOYER_ID,
-                ((Cursor) binding.employerSpinner.getSelectedItem()).getInt(0));
+        values.put(SampleDBContract.Employee.COLUMN_EMPLOYER_ID, ((Cursor) binding.employerSpinner.getSelectedItem()).getInt(0));
 
         Log.d("getINT", ((Cursor) binding.employerSpinner.getSelectedItem()).getInt(0) + "");
         Log.d("getColumnName", ((Cursor) binding.employerSpinner.getSelectedItem()).getColumnName(0));
 
         try {
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime((new SimpleDateFormat("ddMMyyyy")).parse(
-                    binding.dobEditText.getText().toString()));
+            calendar.setTime((new SimpleDateFormat("ddMMyyyy")).parse(binding.dobEditText.getText().toString()));
             long date = calendar.getTimeInMillis();
             values.put(SampleDBContract.Employee.COLUMN_DATE_OF_BIRTH, date);
 
-            calendar.setTime((new SimpleDateFormat("ddMMyyyy")).parse(
-                    binding.employedEditText.getText().toString()));
+            calendar.setTime((new SimpleDateFormat("ddMMyyyy")).parse(binding.employedEditText.getText().toString()));
             date = calendar.getTimeInMillis();
             values.put(SampleDBContract.Employee.COLUMN_EMPLOYED_DATE, date);
         } catch (Exception e) {
@@ -107,5 +120,98 @@ public class EmployeeActivity extends AppCompatActivity {
 
         Cursor cursor = database.rawQuery(SampleDBContract.SELECT_EMPLOYEE_WITH_EMPLOYER, selectionArgs);
         binding.recycleView.setAdapter(new SampleJoinRecyclerViewCursorAdapter(this, cursor));
+    }
+
+
+    private void updateToDB(){
+            SQLiteDatabase database = new SampleDBSQLiteHelper(this).getReadableDatabase();
+            String firstname = binding.firstnameEditText.getText().toString();
+            String[] projection = {
+                    SampleDBContract.Employee._ID,
+                    SampleDBContract.Employee.COLUMN_FIRSTNAME,
+                    SampleDBContract.Employee.COLUMN_LASTNAME,
+                    SampleDBContract.Employee.COLUMN_DATE_OF_BIRTH,
+                    SampleDBContract.Employee.COLUMN_JOB_DESCRIPTION,
+                    SampleDBContract.Employee.COLUMN_EMPLOYED_DATE
+            };
+
+            String selection =
+                    SampleDBContract.Employee.COLUMN_FIRSTNAME + " like ?";
+
+            String[] selectionArgs = {"%" + firstname + "%"};
+
+            Cursor cursor = database.query(
+                    SampleDBContract.Employee.TABLE_NAME,     // The table to query
+                    projection,                               // The columns to return
+                    selection,                                // The columns for the WHERE clause
+                    selectionArgs,                            // The values for the WHERE clause
+                    null,                             // don't group the rows
+                    null,                              // don't filter by row groups
+                    null                              // don't sort
+            );
+            if(cursor.getCount() > 0) {
+                ContentValues values = new ContentValues();
+                values.put(SampleDBContract.Employee.COLUMN_LASTNAME, binding.lastnameEditText.getText().toString());
+                values.put(SampleDBContract.Employee.COLUMN_JOB_DESCRIPTION, binding.jobDescEditText.getText().toString());
+                values.put(SampleDBContract.Employee.COLUMN_EMPLOYER_ID, ((Cursor) binding.employerSpinner.getSelectedItem()).getInt(0));
+
+
+                try {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime((new SimpleDateFormat("dd/MM/yyyy")).parse(binding.dobEditText.getText().toString()));
+                    long date = calendar.getTimeInMillis();
+                    values.put(SampleDBContract.Employee.COLUMN_DATE_OF_BIRTH, date);
+
+                    calendar.setTime((new SimpleDateFormat("dd/MM/yyyy")).parse(binding.employedEditText.getText().toString()));
+                    date = calendar.getTimeInMillis();
+                    values.put(SampleDBContract.Employee.COLUMN_EMPLOYED_DATE, date);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error", e);
+                    Toast.makeText(this, "Date is in the wrong format", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if(cursor.getCount() > 0){
+                    cursor.moveToPosition(0);
+                    String ID = cursor.getString(cursor.getColumnIndexOrThrow(SampleDBContract.Employee._ID));
+                    database.update(SampleDBContract.Employee.TABLE_NAME, values,SampleDBContract.Employee._ID + "=?", new String[] {ID});
+                }
+                Toast.makeText(this, "Updating is done " , Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    private void deleteFromDB() {
+        SQLiteDatabase database = new SampleDBSQLiteHelper(this).getReadableDatabase();
+        String FirstName = binding.firstnameEditText.getText().toString();
+        String LastName = binding.lastnameEditText.getText().toString();
+        String[] projection = {
+                SampleDBContract.Employee._ID,
+                SampleDBContract.Employee.COLUMN_FIRSTNAME,
+                SampleDBContract.Employee.COLUMN_LASTNAME,
+                SampleDBContract.Employee.COLUMN_DATE_OF_BIRTH,
+                SampleDBContract.Employee.COLUMN_JOB_DESCRIPTION,
+                SampleDBContract.Employee.COLUMN_EMPLOYED_DATE,
+                SampleDBContract.Employee.COLUMN_EMPLOYER_ID
+        };
+
+        String selection =
+                SampleDBContract.Employee.COLUMN_FIRSTNAME + " like ? and " + SampleDBContract.Employee.COLUMN_LASTNAME + " like ?";
+
+        String[] selectionArgs = {"%" + FirstName + "%", "%" + LastName + "%"};
+
+        Cursor cursor = database.query(
+                SampleDBContract.Employee.TABLE_NAME,     // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                             // don't group the rows
+                null,                              // don't filter by row groups
+                null                              // don't sort
+        );
+        if(cursor.getCount() > 0){
+            cursor.moveToPosition(0);
+            String ID = cursor.getString(cursor.getColumnIndexOrThrow(SampleDBContract.Employee._ID));
+            database.delete(SampleDBContract.Employee.TABLE_NAME, SampleDBContract.Employee._ID + "=?", new String[] {ID});
+        }
     }
 }
